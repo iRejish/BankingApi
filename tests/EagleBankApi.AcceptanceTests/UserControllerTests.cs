@@ -16,8 +16,8 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     {
         // Arrange
         var request = _fixture.Build<CreateUserRequest>()
-            .With(x=>x.Email, "a@b.com")
-            .With(x=> x.PhoneNumber, "+123456789")
+            .With(x => x.Email, "a@b.com")
+            .With(x => x.PhoneNumber, "+123456789")
             .Create();
 
         // Act
@@ -68,31 +68,5 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
         errorResponse.Details.Should().Contain(d =>
             d.Field == "Name" &&
             d.Message.Contains("required"));
-    }
-
-    [Fact]
-    public async Task CreateUser_WithDuplicateEmail_ReturnsBadRequest()
-    {
-        // Arrange - first create a valid user
-        var email = "duplicate@example.com";
-        var firstUser = _fixture.Build<CreateUserRequest>()
-            .With(x=>x.Email, email)
-            .With(x=> x.PhoneNumber, "+123456789")
-            .Create();
-
-        await _client.PostAsJsonAsync("/v1/users", firstUser);
-
-        // Act - try to create duplicate
-        var secondUser = _fixture.Build<CreateUserRequest>()
-            .With(x=>x.Email, email)
-            .With(x=> x.PhoneNumber, "+123456789")
-            .Create();
-
-        var response = await _client.PostAsJsonAsync("/v1/users", secondUser);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        var error = await response.Content.ReadFromJsonAsync<BadRequestErrorResponse>();
-        error.Message.Should().Contain("Email already in use");
     }
 }

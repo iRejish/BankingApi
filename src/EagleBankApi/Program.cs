@@ -30,6 +30,10 @@ builder.Services.Configure<ApiBehaviorOptions>(o =>
     o.InvalidModelStateResponseFactory = ApiBehaviorOptionsExtensions.ApiStandardErrorFactory;
 });
 
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,6 +51,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 MigrateDb();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.Run();
 

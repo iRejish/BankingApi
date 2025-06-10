@@ -21,7 +21,7 @@ internal static class ApiBehaviorOptionsExtensions
 
         return new BadRequestObjectResult(new BadRequestErrorResponse
         {
-            Message = "Invalid Request",
+            Message = "Error: Bad Request",
             Details = errors
         });
     };
