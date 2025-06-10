@@ -2,7 +2,7 @@ namespace EagleBankApi.Models;
 
 public class BadRequestErrorResponse : ErrorResponse
 {
-    public List<ErrorDetail> Details { get; set; } = new List<ErrorDetail>();
+    public List<ErrorDetail> Details { get; set; } = new();
 
     public class ErrorDetail
     {

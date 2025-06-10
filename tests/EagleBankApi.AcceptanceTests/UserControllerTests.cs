@@ -66,8 +66,8 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
         errorResponse.Should().NotBeNull();
 
         errorResponse.Details.Should().Contain(d =>
-            d.Field.ToString() == "Name" &&
-            d.Message.ToString().Contains("required"));
+            d.Field == "Name" &&
+            d.Message.Contains("required"));
     }
 
     [Fact]

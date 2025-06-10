@@ -1,6 +1,8 @@
+using EagleBankApi;
 using EagleBankApi.Data;
 using EagleBankApi.Repositories;
 using EagleBankApi.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +24,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.Configure<ApiBehaviorOptions>(o =>
+{
+    o.InvalidModelStateResponseFactory = ApiBehaviorOptionsExtensions.ApiStandardErrorFactory;
+});
 
 var app = builder.Build();
 
