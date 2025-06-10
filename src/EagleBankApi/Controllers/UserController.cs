@@ -7,22 +7,15 @@ namespace EagleBankApi.Controllers;
 
 [ApiController]
 [Route("v1/users")]
-public class UsersController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService;
-
-    public UsersController(IUserService userService)
-    {
-        _userService = userService;
-    }
-
     [HttpPost]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
-        var response = await _userService.CreateUserAsync(request);
+        var response = await userService.CreateUserAsync(request);
         return CreatedAtAction(nameof(GetUserById), new { userId = response.Id }, response);
     }
 
@@ -35,7 +28,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserById([FromRoute][RegularExpression(@"^usr-[A-Za-z0-9]+$")] string userId)
     {
-        var response = await _userService.GetUserByIdAsync(userId);
+        var response = await userService.GetUserByIdAsync(userId);
         return Ok(response);
     }
 }

@@ -1,6 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleBankApi", "EagleBankApi\EagleBankApi.csproj", "{932BEF11-FE3F-44EF-8019-2A71A3A61EC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleBankApi", "src\EagleBankApi\EagleBankApi.csproj", "{932BEF11-FE3F-44EF-8019-2A71A3A61EC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleBankApi.UnitTests", "tests\EagleBankApi.UnitTests\EagleBankApi.UnitTests.csproj", "{C5C601DC-179F-468A-9A5E-373E450F31AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3CAA21E5-D5CE-4B75-AB47-1AF12CC12767}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E9751CAC-3389-4B62-861C-6CE919A169DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleBankApi.AcceptanceTests", "tests\EagleBankApi.AcceptanceTests\EagleBankApi.AcceptanceTests.csproj", "{23C5ADA3-6926-4DE3-8DC6-787C15ACA819}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +20,18 @@ Global
 		{932BEF11-FE3F-44EF-8019-2A71A3A61EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{932BEF11-FE3F-44EF-8019-2A71A3A61EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{932BEF11-FE3F-44EF-8019-2A71A3A61EC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C601DC-179F-468A-9A5E-373E450F31AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C601DC-179F-468A-9A5E-373E450F31AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C601DC-179F-468A-9A5E-373E450F31AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C601DC-179F-468A-9A5E-373E450F31AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23C5ADA3-6926-4DE3-8DC6-787C15ACA819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23C5ADA3-6926-4DE3-8DC6-787C15ACA819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23C5ADA3-6926-4DE3-8DC6-787C15ACA819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23C5ADA3-6926-4DE3-8DC6-787C15ACA819}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{932BEF11-FE3F-44EF-8019-2A71A3A61EC5} = {E9751CAC-3389-4B62-861C-6CE919A169DB}
+		{23C5ADA3-6926-4DE3-8DC6-787C15ACA819} = {3CAA21E5-D5CE-4B75-AB47-1AF12CC12767}
+		{C5C601DC-179F-468A-9A5E-373E450F31AD} = {3CAA21E5-D5CE-4B75-AB47-1AF12CC12767}
 	EndGlobalSection
 EndGlobal
