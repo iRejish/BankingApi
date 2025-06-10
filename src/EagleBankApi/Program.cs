@@ -1,29 +1,50 @@
+using System.Text;
 using EagleBankApi;
 using EagleBankApi.Data;
+using EagleBankApi.Extensions;
 using EagleBankApi.Repositories;
 using EagleBankApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGenWithAuth();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(x =>
+    {
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings!.SecretKey)),
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidateIssuer = true,
+            ValidateAudience = true
+        };
+    });
 
 builder.Services.AddDbContext<EagleBankDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("EagleBankDb"));
 });
 
-// Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-// Register services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 builder.Services.Configure<ApiBehaviorOptions>(o =>
 {
@@ -33,6 +54,7 @@ builder.Services.Configure<ApiBehaviorOptions>(o =>
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -42,41 +64,16 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
-MigrateDb();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.Run();
-
-void MigrateDb()
-{
-    using var scope = app.Services.CreateScope();
-    var services = scope.ServiceProvider;
-    try
-    {
-        var dbContext = services.GetRequiredService<EagleBankDbContext>();
-
-        // Apply pending migrations
-        if (dbContext.Database.GetPendingMigrations().Any())
-        {
-            dbContext.Database.Migrate();
-        }
-
-        // Optional: Seed initial data
-        // await SeedData.Initialize(services);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
-    }
-}

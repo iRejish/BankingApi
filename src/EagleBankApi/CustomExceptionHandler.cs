@@ -15,6 +15,7 @@ public class CustomExceptionHandler(IProblemDetailsService problemDetailsService
             Status = exception switch
             {
                 ArgumentException => StatusCodes.Status400BadRequest,
+                KeyNotFoundException => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status500InternalServerError
             },
             Title = "An error occurred",

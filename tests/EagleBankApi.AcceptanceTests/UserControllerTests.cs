@@ -1,9 +1,12 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using EagleBankApi.Models;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using AutoFixture;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EagleBankApi.AcceptanceTests;
 
@@ -68,5 +71,46 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
         errorResponse.Details.Should().Contain(d =>
             d.Field == "Name" &&
             d.Message.Contains("required"));
+    }
+
+    [Fact]
+    public async Task GetUserById_WithValidToken_ReturnsUser()
+    {
+        // Arrange
+        var user = await CreateTestUser();
+        var token =  TestJwtTokenGenerator.GenerateToken(user.Id);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.GetAsync($"/v1/users/{user.Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    private async Task<UserResponse> CreateTestUser()
+    {
+        // Arrange
+        var request = _fixture.Build<CreateUserRequest>()
+            .With(x => x.Email, "a@b.com")
+            .With(x => x.PhoneNumber, "+123456789")
+            .Create();
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/v1/users", request);
+        return await response.Content.ReadFromJsonAsync<UserResponse>();
+    }
+
+    [Fact]
+    public async Task GetUserById_WithoutToken_ReturnsUnauthorized()
+    {
+        // Arrange
+        var user = await CreateTestUser();
+
+        // Act (no token set)
+        var response = await _client.GetAsync($"/v1/users/{user.Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }

@@ -6,7 +6,7 @@ namespace EagleBankApi.Services;
 
 public class UserService(
     IUserRepository userRepository,
-    ILogger<UserService> logger) : IUserService
+    IJwtTokenService jwtTokenService) : IUserService
 {
     public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
     {
@@ -31,12 +31,26 @@ public class UserService(
     public async Task<UserResponse> GetUserByIdAsync(string userId)
     {
         var user = await userRepository.GetByIdAsync(userId);
-        if (user == null)
+        if (user is null)
         {
             throw new KeyNotFoundException("User not found");
         }
 
         return MapToUserResponse(user);
+    }
+
+    public async Task<LoginUserResponse> LoginUser(string email, string password)
+    {
+        var user = await userRepository.GetByEmailAsync(email);
+        if (user is null)
+        {
+            throw new KeyNotFoundException("User not found");
+        }
+
+        //TODO: implement password hash and verify password
+
+        var token = jwtTokenService.GenerateToken(user.Id);
+        return new LoginUserResponse(user.Id, token);
     }
 
     private static UserResponse MapToUserResponse(User user)

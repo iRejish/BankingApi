@@ -22,4 +22,9 @@ public class UserRepository(EagleBankDbContext context) : IUserRepository
     {
         return await context.Users.AnyAsync(u => u.Email == email.ToLower());
     }
+
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return await context.Users.SingleOrDefaultAsync(x=>x.Email.Equals(email));
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using EagleBankApi.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,12 +29,18 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>
             {
                 options.UseSqlite(_connection);
             });
+        });
 
-            // Ensure database is created
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<EagleBankDbContext>();
-            db.Database.EnsureCreated();
+        builder.ConfigureTestServices(services =>
+        {
+            // Override JWT configuration for tests
+            services.Configure<JwtSettings>(options =>
+            {
+                options.SecretKey = TestJwtTokenGenerator.TestSecretKey;
+                options.Issuer = TestJwtTokenGenerator.TestIssuer;
+                options.Audience = TestJwtTokenGenerator.TestAudience;
+                options.ExpiryInMinutes = 60;
+            });
         });
 
         builder.UseEnvironment("Development");
