@@ -27,4 +27,18 @@ public class UserRepository(EagleBankDbContext context) : IUserRepository
     {
         return await context.Users.SingleOrDefaultAsync(x=>x.Email.Equals(email));
     }
+
+    public async Task<User> UpdateAsync(User user)
+    {
+        user.UpdatedTimestamp = DateTime.UtcNow;
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task DeleteAsync(User user)
+    {
+        context.Users.Remove(user);
+        await context.SaveChangesAsync();
+    }
 }

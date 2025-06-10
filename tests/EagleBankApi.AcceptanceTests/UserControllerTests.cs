@@ -113,4 +113,43 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
+
+    [Fact]
+    public async Task UpdateUser_UpdatesUser_WithValidData()
+    {
+        // Arrange
+        var user = await CreateTestUser();
+        var token =  _tokenGenerator.GenerateToken(user.Id);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var updateRequest = new UpdateUserRequest
+        {
+            Name = "Updated Name",
+            PhoneNumber = "+449876543210"
+        };
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/v1/users/{user.Id}", updateRequest);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var updatedUser = await response.Content.ReadFromJsonAsync<UserResponse>();
+        Assert.Equal("Updated Name", updatedUser.Name);
+        Assert.Equal("+449876543210", updatedUser.PhoneNumber);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ReturnsNoContent_WhenSuccessful()
+    {
+        // Arrange
+        var user = await CreateTestUser();
+        var token =  _tokenGenerator.GenerateToken(user.Id);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.DeleteAsync($"/v1/users/{user.Id}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
 }
