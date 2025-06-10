@@ -5,7 +5,6 @@ using EagleBankApi.Models;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using AutoFixture;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EagleBankApi.AcceptanceTests;
@@ -13,6 +12,7 @@ namespace EagleBankApi.AcceptanceTests;
 public class UserControllerTests(CustomWebApplicationFactory factory) : ControllerTestBase(factory)
 {
     private readonly Fixture _fixture = new();
+    private readonly IJwtTokenService _tokenGenerator = factory.Services.GetRequiredService<IJwtTokenService>();
 
     [Fact]
     public async Task CreateUser_WithValidData_ReturnsCreatedResponse()
@@ -78,7 +78,7 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     {
         // Arrange
         var user = await CreateTestUser();
-        var token =  TestJwtTokenGenerator.GenerateToken(user.Id);
+        var token =  _tokenGenerator.GenerateToken(user.Id);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act

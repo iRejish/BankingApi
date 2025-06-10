@@ -11,14 +11,14 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
-
 builder.Services.AddAuthorization();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(x =>
@@ -41,10 +41,12 @@ builder.Services.AddDbContext<EagleBankDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("EagleBankDb"));
 });
 
+// Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+// Register services
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.Configure<ApiBehaviorOptions>(o =>
 {
@@ -54,21 +56,17 @@ builder.Services.Configure<ApiBehaviorOptions>(o =>
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddControllers();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
     app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
