@@ -1,9 +1,7 @@
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using AutoFixture;
 using EagleBankApi.Data;
 using EagleBankApi.Data.Entities;
-using EagleBankApi.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EagleBankApi.AcceptanceTests;
@@ -16,7 +14,6 @@ public class ControllerTestBase : IClassFixture<CustomWebApplicationFactory>, IA
     private IServiceScope _serviceScope;
 
     protected readonly Fixture _fixture = new();
-    protected readonly IJwtTokenService _tokenGenerator;
 
     // Test data constants
     protected const string TestUserId = "usr-test123";
@@ -27,7 +24,6 @@ public class ControllerTestBase : IClassFixture<CustomWebApplicationFactory>, IA
     {
         _factory = factory;
         _client = factory.CreateClient();
-        _tokenGenerator = _factory.Services.GetRequiredService<IJwtTokenService>();
     }
 
     public async Task InitializeAsync()
@@ -73,9 +69,7 @@ public class ControllerTestBase : IClassFixture<CustomWebApplicationFactory>, IA
                 AccountType = AccountType.Personal,
                 Balance = 1000.00m,
                 Currency = "GBP",
-                UserId = TestUserId, // Only set the foreign key
-                CreatedTimestamp = DateTime.UtcNow,
-                UpdatedTimestamp = DateTime.UtcNow
+                UserId = TestUserId
             };
 
             _dbContext.Accounts.Add(account);
@@ -96,24 +90,5 @@ public class ControllerTestBase : IClassFixture<CustomWebApplicationFactory>, IA
         _client.Dispose();
         _client.Dispose();
         GC.SuppressFinalize(this);
-    }
-
-    protected async Task<UserResponse> CreateTestUser()
-    {
-        // Arrange
-        var request = _fixture.Build<CreateUserRequest>()
-            .With(x => x.Email, "a@b.com")
-            .With(x => x.PhoneNumber, "+123456789")
-            .Create();
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/v1/users", request);
-        return await response.Content.ReadFromJsonAsync<UserResponse>();
-    }
-
-    protected void AuthenticateClient(string userId)
-    {
-        var token = _tokenGenerator.GenerateToken(userId);
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 }
