@@ -85,11 +85,17 @@ public sealed class EagleBankDbContext(DbContextOptions<EagleBankDbContext> opti
                 .HasMaxLength(64) // usr- + alphanumeric (adjust as needed)
                 .IsRequired();
 
-            // Relationship with User
-            entity.HasOne(e => e.User)
-                .WithMany() // Assuming User has no navigation property back to Account
-                .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // Or Cascade based on requirements
+            // Configure the User relationship to be query-only
+            entity.HasOne(a => a.User)
+                .WithMany() // No inverse navigation
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false); // Makes the relationship optional for saves
+
+            // Explicitly ignore User property during changes
+            entity.Navigation(a => a.User)
+                .AutoInclude(false) // Don't auto-include in queries
+                .UsePropertyAccessMode(PropertyAccessMode.Property);
 
             // Add indexes for performance
             entity.HasIndex(e => e.UserId);

@@ -36,7 +36,6 @@ public class AccountRepository : IAccountRepository
 
     public async Task<Account> UpdateAsync(Account account)
     {
-        account.UpdatedTimestamp = DateTime.UtcNow;
         _context.Accounts.Update(account);
         await _context.SaveChangesAsync();
         return account;

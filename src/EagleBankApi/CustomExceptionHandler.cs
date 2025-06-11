@@ -14,6 +14,7 @@ public class CustomExceptionHandler(IProblemDetailsService problemDetailsService
         {
             ArgumentException => StatusCodes.Status400BadRequest,
             KeyNotFoundException => StatusCodes.Status404NotFound,
+            InvalidOperationException => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
 

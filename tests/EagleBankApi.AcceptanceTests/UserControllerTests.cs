@@ -1,11 +1,9 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using EagleBankApi.Models;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using AutoFixture;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace EagleBankApi.AcceptanceTests;
 
@@ -64,7 +62,6 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
 
         var errorResponse = await response.Content.ReadFromJsonAsync<BadRequestErrorResponse>();
         errorResponse.Should().NotBeNull();
-
         errorResponse.Details.Should().Contain(d =>
             d.Field == "Name" &&
             d.Message.Contains("required"));
@@ -74,24 +71,24 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     public async Task GetUserById_WithValidToken_ReturnsUser()
     {
         // Arrange
-        var user = await CreateTestUser();
-        AuthenticateClient(user.Id);
+        SetTestAuthToken(TestUserId);
 
         // Act
-        var response = await _client.GetAsync($"/v1/users/{user.Id}");
+        var response = await _client.GetAsync($"/v1/users/{TestUserId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var user = await response.Content.ReadFromJsonAsync<UserResponse>();
+        user.Should().NotBeNull();
+        user.Id.Should().Be(TestUserId);
     }
 
     [Fact]
     public async Task GetUserById_WithoutToken_ReturnsUnauthorized()
     {
-        // Arrange
-        var user = await CreateTestUser();
-
-        // Act (no token set)
-        var response = await _client.GetAsync($"/v1/users/{user.Id}");
+        //Act
+        var response = await _client.GetAsync($"/v1/users/{TestUserId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -101,8 +98,7 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     public async Task UpdateUser_UpdatesUser_WithValidData()
     {
         // Arrange
-        var user = await CreateTestUser();
-        AuthenticateClient(user.Id);
+        SetTestAuthToken(TestUserId);
 
         var updateRequest = new UpdateUserRequest
         {
@@ -111,26 +107,54 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
         };
 
         // Act
-        var response = await _client.PatchAsJsonAsync($"/v1/users/{user.Id}", updateRequest);
+        var response = await _client.PatchAsJsonAsync($"/v1/users/{TestUserId}", updateRequest);
 
         // Assert
         response.EnsureSuccessStatusCode();
+
         var updatedUser = await response.Content.ReadFromJsonAsync<UserResponse>();
-        Assert.Equal("Updated Name", updatedUser.Name);
-        Assert.Equal("+449876543210", updatedUser.PhoneNumber);
+        updatedUser.Should().NotBeNull();
+        updatedUser.Name.Should().Be(updateRequest.Name);
+        updatedUser.PhoneNumber.Should().Be(updateRequest.PhoneNumber);
     }
 
     [Fact]
     public async Task DeleteUser_ReturnsNoContent_WhenSuccessful()
     {
         // Arrange
-        var user = await CreateTestUser();
-        AuthenticateClient(user.Id);
+        SetTestAuthToken(TestUserId);
+
+        // First delete the associated account
+        await _dbContext.Accounts
+            .Where(a => a.UserId == TestUserId).ExecuteDeleteAsync();
 
         // Act
-        var response = await _client.DeleteAsync($"/v1/users/{user.Id}");
+        var response = await _client.DeleteAsync($"/v1/users/{TestUserId}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ReturnsConflict_WhenAccountsExist()
+    {
+        // Arrange
+        SetTestAuthToken(TestUserId);
+
+        // Ensure account exists
+        var account = await _dbContext.Accounts
+            .FirstOrDefaultAsync(a => a.UserId == TestUserId);
+        account.Should().NotBeNull();
+
+        // Act
+        var response = await _client.DeleteAsync($"/v1/users/{TestUserId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+
+        // Verify user was NOT deleted
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.Id == TestUserId);
+        user.Should().NotBeNull();
     }
 }

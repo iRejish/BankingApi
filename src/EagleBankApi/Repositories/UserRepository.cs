@@ -1,5 +1,6 @@
 using EagleBankApi.Data;
 using EagleBankApi.Data.Entities;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace EagleBankApi.Repositories;
@@ -38,7 +39,14 @@ public class UserRepository(EagleBankDbContext context) : IUserRepository
 
     public async Task DeleteAsync(User user)
     {
-        context.Users.Remove(user);
-        await context.SaveChangesAsync();
+        try
+        {
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException("User can't be deleted if they have accounts");
+        }
     }
 }

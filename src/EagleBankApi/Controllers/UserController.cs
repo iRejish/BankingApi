@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EagleBankApi.Models;
 using EagleBankApi.Services;
@@ -31,7 +32,7 @@ public class UserController(IUserService userService) : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserById([FromRoute][RegularExpression(@"^usr-[A-Za-z0-9]+$")] string userId)
     {
-        var requestingUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var requestingUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (userId != requestingUserId) return Forbid();
 
         var response = await userService.GetUserByIdAsync(userId);
@@ -60,7 +61,7 @@ public class UserController(IUserService userService) : ControllerBase
         [FromRoute][RegularExpression(@"^usr-[A-Za-z0-9]+$")] string userId,
         [FromBody] UpdateUserRequest request)
     {
-        var requestingUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var requestingUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (userId != requestingUserId) return Forbid();
 
         var response = await userService.UpdateUserAsync(userId, request);
@@ -78,7 +79,7 @@ public class UserController(IUserService userService) : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteUser([FromRoute][RegularExpression(@"^usr-[A-Za-z0-9]+$")] string userId)
     {
-        var requestingUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var requestingUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (userId != requestingUserId) return Forbid();
 
         await userService.DeleteUserAsync(userId);
