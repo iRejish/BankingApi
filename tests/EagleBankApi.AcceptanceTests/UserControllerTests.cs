@@ -11,9 +11,6 @@ namespace EagleBankApi.AcceptanceTests;
 
 public class UserControllerTests(CustomWebApplicationFactory factory) : ControllerTestBase(factory)
 {
-    private readonly Fixture _fixture = new();
-    private readonly IJwtTokenService _tokenGenerator = factory.Services.GetRequiredService<IJwtTokenService>();
-
     [Fact]
     public async Task CreateUser_WithValidData_ReturnsCreatedResponse()
     {
@@ -78,27 +75,13 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     {
         // Arrange
         var user = await CreateTestUser();
-        var token =  _tokenGenerator.GenerateToken(user.Id);
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticateClient(user.Id);
 
         // Act
         var response = await _client.GetAsync($"/v1/users/{user.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    private async Task<UserResponse> CreateTestUser()
-    {
-        // Arrange
-        var request = _fixture.Build<CreateUserRequest>()
-            .With(x => x.Email, "a@b.com")
-            .With(x => x.PhoneNumber, "+123456789")
-            .Create();
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/v1/users", request);
-        return await response.Content.ReadFromJsonAsync<UserResponse>();
     }
 
     [Fact]
@@ -119,8 +102,7 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     {
         // Arrange
         var user = await CreateTestUser();
-        var token =  _tokenGenerator.GenerateToken(user.Id);
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticateClient(user.Id);
 
         var updateRequest = new UpdateUserRequest
         {
@@ -143,8 +125,7 @@ public class UserControllerTests(CustomWebApplicationFactory factory) : Controll
     {
         // Arrange
         var user = await CreateTestUser();
-        var token =  _tokenGenerator.GenerateToken(user.Id);
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticateClient(user.Id);
 
         // Act
         var response = await _client.DeleteAsync($"/v1/users/{user.Id}");

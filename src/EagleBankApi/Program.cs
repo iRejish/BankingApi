@@ -1,4 +1,7 @@
 using System.Text;
+using System.Text.Json.Serialization;
+using BankingApi.Repositories;
+using BankingApi.Services;
 using EagleBankApi;
 using EagleBankApi.Data;
 using EagleBankApi.Extensions;
@@ -13,7 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
 builder.Services.AddAuthorization();
@@ -43,10 +51,12 @@ builder.Services.AddDbContext<EagleBankDbContext>(options =>
 
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.Configure<ApiBehaviorOptions>(o =>
 {

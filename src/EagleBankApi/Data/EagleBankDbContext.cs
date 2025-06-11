@@ -6,6 +6,7 @@ namespace EagleBankApi.Data;
 public sealed class EagleBankDbContext(DbContextOptions<EagleBankDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Account> Accounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,5 +27,80 @@ public sealed class EagleBankDbContext(DbContextOptions<EagleBankDbContext> opti
             entity.Property(u => u.PhoneNumber).IsRequired().HasMaxLength(20);
             entity.Property(u => u.Email).IsRequired().HasMaxLength(100);
         });
+
+        //generated code
+        modelBuilder.Entity<Account>(entity =>
+        {
+            // Primary Key
+            entity.HasKey(e => e.AccountNumber);
+
+            // AccountNumber configuration
+            entity.Property(e => e.AccountNumber)
+                .HasMaxLength(8) // Matches regex pattern length ^01\d{6}$
+                .IsFixedLength() // Optimize for fixed-length account numbers
+                .IsRequired();
+
+            // SortCode configuration
+            entity.Property(e => e.SortCode)
+                .HasMaxLength(8) // "10-10-10" is 8 chars
+                .HasDefaultValue("10-10-10")
+                .IsRequired();
+
+            // Name configuration
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            // AccountType configuration (enum as string)
+            entity.Property(e => e.AccountType)
+                .HasConversion<string>()
+                .HasMaxLength(20) // Longest enum value length
+                .IsRequired();
+
+            // Balance configuration
+            entity.Property(e => e.Balance)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0m)
+                .IsRequired();
+
+            // Currency configuration
+            entity.Property(e => e.Currency)
+                .HasMaxLength(3)
+                .HasDefaultValue("GBP")
+                .IsRequired();
+
+            // Timestamps configuration
+            entity.Property(e => e.CreatedTimestamp)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP") // SQL Server syntax
+                .ValueGeneratedOnAdd()
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedTimestamp)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAddOrUpdate()
+                .IsRequired();
+
+            // UserId configuration
+            entity.Property(e => e.UserId)
+                .HasMaxLength(64) // usr- + alphanumeric (adjust as needed)
+                .IsRequired();
+
+            // Relationship with User
+            entity.HasOne(e => e.User)
+                .WithMany() // Assuming User has no navigation property back to Account
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Or Cascade based on requirements
+
+            // Add indexes for performance
+            entity.HasIndex(e => e.UserId);
+        });
+
+        // If using SQLite, add this to ensure proper column types
+        if (Database.IsSqlite())
+        {
+            modelBuilder.Entity<Account>()
+                .Property(e => e.Balance)
+                .HasConversion<double>(); // SQLite doesn't support decimal natively
+        }
     }
 }
