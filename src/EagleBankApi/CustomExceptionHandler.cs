@@ -15,6 +15,10 @@ public class CustomExceptionHandler(IProblemDetailsService problemDetailsService
             ArgumentException => StatusCodes.Status400BadRequest,
             KeyNotFoundException => StatusCodes.Status404NotFound,
             InvalidOperationException => StatusCodes.Status409Conflict,
+            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+            ForbiddenException => StatusCodes.Status403Forbidden,
+            FormatException => StatusCodes.Status422UnprocessableEntity,
+
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -36,3 +40,5 @@ public class CustomExceptionHandler(IProblemDetailsService problemDetailsService
         });
     }
 }
+
+public class ForbiddenException(string message = "Forbidden") : Exception(message);

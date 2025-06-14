@@ -1,6 +1,6 @@
 using EagleBankApi.Data.Entities;
 
-namespace BankingApi.Repositories;
+namespace EagleBankApi.Repositories;
 
 public interface IAccountRepository
 {
@@ -9,4 +9,5 @@ public interface IAccountRepository
     Task<Account?> GetByAccountNumberAsync(string accountNumber, string userId);
     Task<Account> UpdateAsync(Account account);
     Task DeleteAsync(Account account);
+    Task<Account> GetByAccountNumberAsync(string accountNumber);
 }

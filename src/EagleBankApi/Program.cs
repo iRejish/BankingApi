@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.Json.Serialization;
-using BankingApi.Repositories;
 using BankingApi.Services;
 using EagleBankApi;
 using EagleBankApi.Data;
@@ -52,11 +51,14 @@ builder.Services.AddDbContext<EagleBankDbContext>(options =>
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 builder.Services.Configure<ApiBehaviorOptions>(o =>
 {

@@ -19,7 +19,7 @@ namespace EagleBankApi.Migrations
                     SortCode = table.Column<string>(type: "TEXT", maxLength: 8, nullable: false, defaultValue: "10-10-10"),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     AccountType = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Balance = table.Column<double>(type: "decimal(18,2)", nullable: false, defaultValue: 0.0),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0.0),
                     Currency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: false, defaultValue: "GBP"),
                     CreatedTimestamp = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     UpdatedTimestamp = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),

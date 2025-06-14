@@ -1,49 +1,47 @@
-using BankingApi.Repositories;
 using EagleBankApi.Data;
 using EagleBankApi.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EagleBankApi.Repositories;
 
-public class AccountRepository : IAccountRepository
+public class AccountRepository(EagleBankDbContext context) : IAccountRepository
 {
-    private readonly EagleBankDbContext _context;
-
-    public AccountRepository(EagleBankDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Account> CreateAsync(Account account)
     {
-        _context.Accounts.Add(account);
-        await _context.SaveChangesAsync();
+        context.Accounts.Add(account);
+        await context.SaveChangesAsync();
         return account;
     }
 
     public async Task<IEnumerable<Account>> GetAllForUserAsync(string userId)
     {
-        return await _context.Accounts
+        return await context.Accounts
             .Where(a => a.UserId == userId)
             .ToListAsync();
     }
 
     public async Task<Account?> GetByAccountNumberAsync(string accountNumber, string userId)
     {
-        return await _context.Accounts
+        return await context.Accounts
             .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber && a.UserId == userId);
+    }
+
+    public async Task<Account> GetByAccountNumberAsync(string accountNumber)
+    {
+        return await context.Accounts
+            .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
     }
 
     public async Task<Account> UpdateAsync(Account account)
     {
-        _context.Accounts.Update(account);
-        await _context.SaveChangesAsync();
+        context.Accounts.Update(account);
+        await context.SaveChangesAsync();
         return account;
     }
 
     public async Task DeleteAsync(Account account)
     {
-        _context.Accounts.Remove(account);
-        await _context.SaveChangesAsync();
+        context.Accounts.Remove(account);
+        await context.SaveChangesAsync();
     }
 }

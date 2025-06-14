@@ -7,6 +7,7 @@ public sealed class EagleBankDbContext(DbContextOptions<EagleBankDbContext> opti
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -108,5 +109,48 @@ public sealed class EagleBankDbContext(DbContextOptions<EagleBankDbContext> opti
                 .Property(e => e.Balance)
                 .HasConversion<double>(); // SQLite doesn't support decimal natively
         }
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            // Primary Key
+            entity.HasKey(t => t.Id);
+            entity.Property(t => t.Id)
+                .HasMaxLength(64) // Matches User.Id configuration
+                .IsRequired();
+
+            // Required fields with constraints
+            entity.Property(t => t.Amount)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)"); // Ensures 2 decimal places for currency
+
+            entity.Property(t => t.Currency)
+                .IsRequired()
+                .HasMaxLength(3); // "GBP" is 3 chars
+
+            entity.Property(t => t.Type)
+                .IsRequired()
+                .HasMaxLength(10); // "deposit" (7) or "withdrawal" (9)
+
+            entity.Property(t => t.Reference)
+                .HasMaxLength(100); // Optional, but limit length if provided
+
+            // Foreign Key relationships (if needed)
+            entity.Property(t => t.UserId)
+                .IsRequired()
+                .HasMaxLength(64); // Matches User.Id length
+
+            entity.Property(t => t.AccountNumber)
+                .IsRequired()
+                .HasMaxLength(8) // Matches ^01\d{6}$ (8 chars total)
+                .IsFixedLength(); // Ensures exact length (no padding)
+
+            // Timestamps
+            entity.Property(t => t.CreatedTimestamp)
+                .IsRequired()
+                .HasColumnType("datetime2"); // Precise timestamp
+
+            entity.HasIndex(t => t.AccountNumber);
+            entity.HasIndex(t => t.UserId);
+        });
     }
 }

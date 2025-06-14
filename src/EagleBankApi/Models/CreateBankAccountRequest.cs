@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using EagleBankApi.Data.Entities;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace EagleBankApi.Models;
 
