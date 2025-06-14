@@ -1,8 +1,7 @@
 ﻿using AutoFixture;
-using EagleBankApi.Application.Models;
-using EagleBankApi.Application.Services;
-using EagleBankApi.Controllers;
-using EagleBankApi.Services;
+using EagleBank.Api.Controllers;
+using EagleBank.Application.Models;
+using EagleBank.Application.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using AutoFixture;
-using EagleBankApi.Application.Models;
+using EagleBank.Application.Models;
 using FluentAssertions;
 
 namespace EagleBankApi.AcceptanceTests;
@@ -20,7 +20,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var account = await response.Content.ReadFromJsonAsync<BankAccountResponse>();
+        var account = await response.Content.ReadFromJsonAsync<AccountResponse>();
         account.Should().NotBeNull();
         account.AccountNumber.Should().Be(TestAccountNumber);
     }
@@ -31,7 +31,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Arrange
         SetTestAuthToken(TestUserId);
 
-        var request = _fixture.Create<CreateBankAccountRequest>();
+        var request = _fixture.Create<CreateAccountRequest>();
 
         // Act
         var response = await _client.PostAsJsonAsync("/v1/accounts", request);
@@ -39,7 +39,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var createdAccount = await response.Content.ReadFromJsonAsync<BankAccountResponse>();
+        var createdAccount = await response.Content.ReadFromJsonAsync<AccountResponse>();
         createdAccount.Should().NotBeNull();
         createdAccount.Name.Should().Be(request.Name);
         createdAccount.AccountType.Should().Be(request.AccountType);
@@ -58,9 +58,9 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Assert
         response.EnsureSuccessStatusCode();
 
-        var accounts = await response.Content.ReadFromJsonAsync<ListBankAccountsResponse>();
+        var accounts = await response.Content.ReadFromJsonAsync<ListAccountsResponse>();
         accounts.Accounts.Should().HaveCount(1);
-        accounts.Accounts[0].AccountNumber.Should().Be(TestAccountNumber);
+        accounts.Accounts.First().AccountNumber.Should().Be(TestAccountNumber);
     }
 
     [Fact]
@@ -69,14 +69,14 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Arrange
         SetTestAuthToken(TestUserId);
 
-        var updateRequest = _fixture.Create<UpdateBankAccountRequest>();
+        var updateRequest = _fixture.Create<UpdateAccountRequest>();
 
         // Act
         var response = await _client.PatchAsJsonAsync($"/v1/accounts/{TestAccountNumber}", updateRequest);
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var updatedAccount = await response.Content.ReadFromJsonAsync<BankAccountResponse>();
+        var updatedAccount = await response.Content.ReadFromJsonAsync<AccountResponse>();
         updatedAccount.Should().NotBeNull();
         updatedAccount.Name.Should().Be(updateRequest.Name);
         updatedAccount.AccountNumber.Should().Be(TestAccountNumber);

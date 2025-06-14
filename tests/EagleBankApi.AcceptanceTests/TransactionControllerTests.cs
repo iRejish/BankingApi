@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using AutoFixture;
-using EagleBankApi.Application.Models;
-using EagleBankApi.Domain.Entities;
+using EagleBank.Application.Models;
+using EagleBank.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace EagleBankApi.AcceptanceTests;
 
@@ -147,6 +147,8 @@ public class TransactionControllerTests(CustomWebApplicationFactory factory) : C
             _fixture.Build<Transaction>()
                 .With(t => t.AccountNumber, TestAccountNumber)
                 .With(t => t.Type, "deposit")
+                .With(t=>t.UserId, TestUserId)
+                .Without(t=>t.Account)
                 .CreateMany(3));
         await _dbContext.SaveChangesAsync();
 
@@ -181,6 +183,8 @@ public class TransactionControllerTests(CustomWebApplicationFactory factory) : C
         var transaction = _fixture.Build<Transaction>()
             .With(t => t.Id, TestTransactionId)
             .With(t => t.AccountNumber, TestAccountNumber)
+            .With(t=>t.UserId, TestUserId)
+            .Without(t=>t.Account)
             .Create();
         _dbContext.Transactions.Add(transaction);
         await _dbContext.SaveChangesAsync();

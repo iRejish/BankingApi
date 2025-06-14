@@ -1,10 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using AutoFixture;
-using EagleBankApi.Application.Models;
-using EagleBankApi.Domain.Entities;
+using EagleBank.Application.Models;
+using EagleBank.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace EagleBankApi.AcceptanceTests;
 
