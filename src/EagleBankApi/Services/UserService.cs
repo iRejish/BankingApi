@@ -1,6 +1,7 @@
-using EagleBankApi.Data.Entities;
-using EagleBankApi.Models;
-using EagleBankApi.Repositories;
+using EagleBankApi.Application.Models;
+using EagleBankApi.Application.Services;
+using EagleBankApi.Domain.Entities;
+using EagleBankApi.Domain.Interfaces;
 
 namespace EagleBankApi.Services;
 

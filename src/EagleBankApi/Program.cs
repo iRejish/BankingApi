@@ -1,10 +1,11 @@
 using System.Text;
 using System.Text.Json.Serialization;
-using BankingApi.Services;
 using EagleBankApi;
-using EagleBankApi.Data;
+using EagleBankApi.Application.Services;
+using EagleBankApi.Domain.Interfaces;
 using EagleBankApi.Extensions;
-using EagleBankApi.Repositories;
+using EagleBankApi.Infrastructure.Data;
+using EagleBankApi.Infrastructure.Repositories;
 using EagleBankApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;

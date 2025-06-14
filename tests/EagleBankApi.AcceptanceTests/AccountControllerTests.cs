@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using AutoFixture;
-using EagleBankApi.Models;
+using EagleBankApi.Application.Models;
 using FluentAssertions;
 
 namespace EagleBankApi.AcceptanceTests;

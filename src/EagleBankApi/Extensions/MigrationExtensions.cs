@@ -1,4 +1,4 @@
-﻿using EagleBankApi.Data;
+﻿using EagleBankApi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace EagleBankApi.Extensions;

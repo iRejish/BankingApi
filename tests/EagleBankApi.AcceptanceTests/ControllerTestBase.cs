@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using AutoFixture;
-using EagleBankApi.Data;
-using EagleBankApi.Data.Entities;
+using EagleBankApi.Domain.Entities;
+using EagleBankApi.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EagleBankApi.AcceptanceTests;

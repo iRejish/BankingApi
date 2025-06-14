@@ -1,4 +1,4 @@
-using EagleBankApi.Models;
+using EagleBankApi.Application.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 

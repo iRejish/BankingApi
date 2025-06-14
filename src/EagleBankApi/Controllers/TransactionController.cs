@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using BankingApi.Services;
-using EagleBankApi.Models;
+using EagleBankApi.Application.Models;
+using EagleBankApi.Application.Services;
 using EagleBankApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
