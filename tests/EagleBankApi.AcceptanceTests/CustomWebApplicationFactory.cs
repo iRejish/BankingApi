@@ -1,5 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
 using EagleBankApi.Data;
 using Microsoft.AspNetCore.Authentication;
@@ -33,6 +32,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>
             services.AddDbContext<EagleBankDbContext>(options =>
             {
                 options.UseSqlite(_connection);
+                options.EnableSensitiveDataLogging();
             });
 
             //Add test authentication
@@ -58,7 +58,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("TestScheme ", "");
-            var claims = new[] { new Claim(JwtRegisteredClaimNames.Sub, token) }; // Use token value as user ID
+            var claims = new[] { new Claim(ClaimTypes.NameIdentifier, token) }; // Use token value as user ID
             var identity = new ClaimsIdentity(claims, "Test");
             var principal = new ClaimsPrincipal(identity);
             return Task.FromResult(AuthenticateResult.Success(

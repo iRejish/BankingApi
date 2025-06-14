@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using EagleBankApi.Data.Entities;
 using EagleBankApi.Models;
 using EagleBankApi.Repositories;
