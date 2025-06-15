@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using EagleBank.Domain.Entities;
 
 namespace EagleBank.Application.Models;
@@ -14,7 +13,6 @@ public class AccountResponse
 
     public string Name { get; set; }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public AccountType AccountType { get; set; }
 
     [Range(0.00, 10000.00)]
@@ -34,7 +32,6 @@ public class CreateAccountRequest
     public string Name { get; set; }
 
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public AccountType AccountType { get; set; }
 }
 
@@ -43,7 +40,6 @@ public class UpdateAccountRequest
     public string Name { get; set; }
 
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public AccountType AccountType { get; set; }
 }
 

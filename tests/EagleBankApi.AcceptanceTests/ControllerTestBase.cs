@@ -1,4 +1,6 @@
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AutoFixture;
 using EagleBank.Domain.Entities;
 using EagleBank.Infrastructure.Data;
@@ -14,6 +16,7 @@ public class ControllerTestBase : IClassFixture<CustomWebApplicationFactory>, IA
     private IServiceScope _serviceScope;
 
     protected readonly Fixture _fixture = new();
+    protected readonly JsonSerializerOptions _jsonOptions;
 
     // Test data constants
     protected const string TestUserId = "usr-test123";
@@ -24,6 +27,12 @@ public class ControllerTestBase : IClassFixture<CustomWebApplicationFactory>, IA
     {
         _factory = factory;
         _client = factory.CreateClient();
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        };
     }
 
     public async Task InitializeAsync()

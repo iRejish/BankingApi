@@ -20,7 +20,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var account = await response.Content.ReadFromJsonAsync<AccountResponse>();
+        var account = await response.Content.ReadFromJsonAsync<AccountResponse>(_jsonOptions);
         account.Should().NotBeNull();
         account.AccountNumber.Should().Be(TestAccountNumber);
     }
@@ -39,7 +39,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var createdAccount = await response.Content.ReadFromJsonAsync<AccountResponse>();
+        var createdAccount = await response.Content.ReadFromJsonAsync<AccountResponse>(_jsonOptions);
         createdAccount.Should().NotBeNull();
         createdAccount.Name.Should().Be(request.Name);
         createdAccount.AccountType.Should().Be(request.AccountType);
@@ -58,7 +58,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
         // Assert
         response.EnsureSuccessStatusCode();
 
-        var accounts = await response.Content.ReadFromJsonAsync<ListAccountsResponse>();
+        var accounts = await response.Content.ReadFromJsonAsync<ListAccountsResponse>(_jsonOptions);
         accounts.Accounts.Should().HaveCount(1);
         accounts.Accounts.First().AccountNumber.Should().Be(TestAccountNumber);
     }
@@ -76,7 +76,7 @@ public class AccountControllerTests(CustomWebApplicationFactory factory) : Contr
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var updatedAccount = await response.Content.ReadFromJsonAsync<AccountResponse>();
+        var updatedAccount = await response.Content.ReadFromJsonAsync<AccountResponse>(_jsonOptions);
         updatedAccount.Should().NotBeNull();
         updatedAccount.Name.Should().Be(updateRequest.Name);
         updatedAccount.AccountNumber.Should().Be(TestAccountNumber);
